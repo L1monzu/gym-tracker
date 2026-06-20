@@ -8,6 +8,13 @@ edition = "2021"
 
 [dependencies]
 dioxus = { version = "0.7.1", features = ["router"] }
+sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite", "macros", "migrate"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+dirs = "5"
+
+[target.'cfg(target_os = "android")'.dependencies]
+jni = "0.21"
+ndk-context = "0.1"
 
 [features]
 default = ["mobile"]
