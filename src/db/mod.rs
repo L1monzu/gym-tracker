@@ -6,7 +6,7 @@
 //! any manual setup steps for the user.
 
 use sqlx::sqlite::{SqlitePool, SqlitePoolOptions};
-
+pub mod exercises;
 /// Works out the right folder to store app data in, depending on which
 /// platform we're running on.
 ///

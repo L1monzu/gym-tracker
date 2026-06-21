@@ -1,0 +1,1 @@
+ALTER TABLE exercise_logs DROP COLUMN sets;
