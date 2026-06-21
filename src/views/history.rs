@@ -1,4 +1,6 @@
+use crate::db::export::build_workbook;
 use crate::db::history::{delete_cardio_log, delete_exercise_logs, load_history, HistoryEntry};
+use crate::db::app_data_dir;
 use dioxus::prelude::*;
 use sqlx::SqlitePool;
 
@@ -7,6 +9,29 @@ pub fn History() -> Element {
     let pool = use_context::<SqlitePool>();
     let mut reload_trigger = use_signal(|| 0);
     let mut confirming_key = use_signal(|| None::<String>);
+
+    let mut export_status = use_signal(String::new);
+
+    let do_export = {
+        let pool = pool.clone();
+        move |_| {
+            let pool = pool.clone();
+            spawn(async move {
+                export_status.set("Exporting...".to_string());
+                match build_workbook(&pool).await {
+                    Ok(bytes) => {
+                        let path = app_data_dir().join("gym-tracker-export.xlsx");
+                        match std::fs::write(&path, bytes) {
+                            Ok(()) => export_status
+                                .set(format!("Saved to {}", path.display())),
+                            Err(e) => export_status.set(format!("Failed to save file: {e}")),
+                        }
+                    }
+                    Err(e) => export_status.set(format!("Export failed: {e}")),
+                }
+            });
+        }
+    };
 
     let history = use_resource({
         let pool = pool.clone();
@@ -20,6 +45,17 @@ pub fn History() -> Element {
     rsx! {
         div { class: "min-h-screen bg-background-light dark:bg-background-dark p-6",
             h1 { class: "text-2xl font-bold text-text-light dark:text-text-dark mb-6", "History" }
+
+            div { class: "mb-6",
+                button {
+                    class: "bg-accent hover:opacity-90 text-white font-medium rounded-lg px-4 py-2",
+                    onclick: do_export,
+                    "Export to Excel"
+                }
+                if !export_status().is_empty() {
+                    p { class: "text-text-muted text-sm mt-2", "{export_status}" }
+                }
+            }
 
             match &*history.read() {
                 None => rsx! { p { class: "text-text-muted", "Loading..." } },
