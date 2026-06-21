@@ -1,6 +1,5 @@
 use crate::db::export::build_workbook;
 use crate::db::history::{delete_cardio_log, delete_exercise_logs, load_history, HistoryEntry};
-use crate::db::app_data_dir;
 use dioxus::prelude::*;
 use sqlx::SqlitePool;
 
@@ -20,11 +19,21 @@ pub fn History() -> Element {
                 export_status.set("Exporting...".to_string());
                 match build_workbook(&pool).await {
                     Ok(bytes) => {
-                        let path = app_data_dir().join("gym-tracker-export.xlsx");
-                        match std::fs::write(&path, bytes) {
-                            Ok(()) => export_status
-                                .set(format!("Saved to {}", path.display())),
-                            Err(e) => export_status.set(format!("Failed to save file: {e}")),
+                        #[cfg(target_os = "android")]
+                        {
+                            match crate::db::save_to_downloads("gym-tracker-export.xlsx", &bytes) {
+                                Ok(()) => export_status
+                                    .set("Saved to Downloads. Open the Files app or Drive to share it.".to_string()),
+                                Err(e) => export_status.set(format!("Failed to save file: {e}")),
+                            }
+                        }
+                        #[cfg(not(target_os = "android"))]
+                        {
+                            let path = crate::db::shareable_files_dir().join("gym-tracker-export.xlsx");
+                            match std::fs::write(&path, bytes) {
+                                Ok(()) => export_status.set(format!("Saved to {}", path.display())),
+                                Err(e) => export_status.set(format!("Failed to save file: {e}")),
+                            }
                         }
                     }
                     Err(e) => export_status.set(format!("Export failed: {e}")),
@@ -53,7 +62,7 @@ pub fn History() -> Element {
                     "Export to Excel"
                 }
                 if !export_status().is_empty() {
-                    p { class: "text-text-muted text-sm mt-2", "{export_status}" }
+                    p { class: "text-text-muted text-sm mt-2 break-words", "{export_status}" }
                 }
             }
 
