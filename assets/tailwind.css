@@ -254,6 +254,13 @@
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 1px;
   }
+  .border-l-2 {
+    border-left-style: var(--tw-border-style);
+    border-left-width: 2px;
+  }
+  .border-accent {
+    border-color: var(--color-accent);
+  }
   .border-gray-200 {
     border-color: var(--color-gray-200);
   }
@@ -299,8 +306,14 @@
   .py-4 {
     padding-block: calc(var(--spacing) * 4);
   }
+  .pl-4 {
+    padding-left: calc(var(--spacing) * 4);
+  }
   .text-center {
     text-align: center;
+  }
+  .text-left {
+    text-align: left;
   }
   .text-2xl {
     font-size: var(--text-2xl);
@@ -329,6 +342,9 @@
   .font-semibold {
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
+  }
+  .text-accent {
+    color: var(--color-accent);
   }
   .text-text-light {
     color: var(--color-text-light);

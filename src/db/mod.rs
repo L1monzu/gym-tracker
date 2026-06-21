@@ -7,6 +7,8 @@
 
 use sqlx::sqlite::{SqlitePool, SqlitePoolOptions};
 pub mod exercises;
+pub mod cardio;
+
 /// Works out the right folder to store app data in, depending on which
 /// platform we're running on.
 ///
