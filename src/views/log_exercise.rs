@@ -21,7 +21,7 @@ pub fn LogExercise() -> Element {
     });
 
     let mut exercise_name = use_signal(String::new);
-    let mut logged_at = use_signal(String::new);
+    let mut logged_at = use_signal(crate::views::start_workout::today);
     let mut set_inputs = use_signal(|| vec![SetInput::default()]);
     let mut status = use_signal(String::new);
 
@@ -78,7 +78,6 @@ pub fn LogExercise() -> Element {
                 Ok(()) => {
                     status.set("Saved!".to_string());
                     exercise_name.set(String::new());
-                    logged_at.set(String::new());
                     set_inputs.set(vec![SetInput::default()]);
                 }
                 Err(e) => status.set(format!("Failed to save: {e}")),
@@ -120,7 +119,7 @@ pub fn LogExercise() -> Element {
                 div { class: "flex flex-col gap-3",
                     for (i , _set) in set_inputs().iter().enumerate() {
                         div { class: "flex gap-2 items-end",
-                            label { class: "text-text-light dark:text-text-dark text-sm flex-1",
+                            label { class: "text-text-light dark:text-text-dark text-sm flex-1 min-w-0",
                                 "Weight (kg)"
                                 input {
                                     class: "mt-1 w-full rounded-md border border-gray-300 dark:border-gray-700 bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark px-3 py-2",
@@ -129,7 +128,7 @@ pub fn LogExercise() -> Element {
                                     oninput: move |e| set_inputs.write()[i].weight = e.value(),
                                 }
                             }
-                            label { class: "text-text-light dark:text-text-dark text-sm flex-1",
+                            label { class: "text-text-light dark:text-text-dark text-sm flex-1 min-w-0",
                                 "Reps"
                                 input {
                                     class: "mt-1 w-full rounded-md border border-gray-300 dark:border-gray-700 bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark px-3 py-2",
@@ -139,9 +138,9 @@ pub fn LogExercise() -> Element {
                                 }
                             }
                             button {
-                                class: "text-text-muted px-2 py-2",
+                                class: "text-text-muted px-2 py-2 shrink-0",
                                 onclick: move |_| remove_set(i),
-                                "✕"
+                                "x"
                             }
                         }
                     }

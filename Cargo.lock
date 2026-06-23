@@ -2383,6 +2383,7 @@ version = "0.1.0"
 dependencies = [
  "dioxus",
  "dirs 5.0.1",
+ "gloo-timers",
  "jni 0.21.1",
  "ndk-context",
  "rust_xlsxwriter",

@@ -6,5 +6,7 @@ mod log_cardio;
 pub use log_cardio::LogCardio;
 mod history;
 pub use history::History;
+mod start_workout;
+pub use start_workout::StartWorkout;
 mod navbar;
 pub use navbar::Navbar;

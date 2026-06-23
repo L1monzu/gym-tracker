@@ -10,6 +10,11 @@ pub fn Home() -> Element {
             }
             div { class: "flex flex-col gap-4 max-w-md",
                 Link {
+                    to: Route::StartWorkout {},
+                    class: "bg-accent hover:opacity-90 text-white text-lg font-semibold rounded-lg px-6 py-4 text-center",
+                    "Start Workout"
+                }
+                Link {
                     to: Route::LogExercise {},
                     class: "bg-primary hover:bg-primary-dark text-white text-lg font-semibold rounded-lg px-6 py-4 text-center",
                     "Log Exercise"

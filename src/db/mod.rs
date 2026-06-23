@@ -11,6 +11,7 @@ pub mod cardio;
 pub mod exercises;
 pub mod export;
 pub mod history;
+pub mod templates;
 
 /// Works out the right folder to store app data in, depending on which
 /// platform we're running on.

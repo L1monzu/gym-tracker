@@ -2,7 +2,7 @@
 // need dioxus
 use dioxus::prelude::*;
 
-use views::{History, Home, LogCardio, LogExercise, Navbar};
+use views::{History, Home, LogCardio, LogExercise, Navbar, StartWorkout};
 
 /// Define a components module that contains all shared components for our app.
 mod components;
@@ -21,6 +21,8 @@ enum Route {
     #[layout(Navbar)]
         #[route("/")]
         Home {},
+        #[route("/start-workout")]
+        StartWorkout {},
         #[route("/log-exercise")]
         LogExercise {},
         #[route("/log-cardio")]
