@@ -103,7 +103,7 @@ pub fn StartWorkout() -> Element {
     let mut status = use_signal(String::new);
     let mut logged_at = use_signal(today);
     let mut just_moved_id = use_signal(|| None::<i64>);
-    
+
     use_effect(move || {
         if just_moved_id().is_some() {
             spawn(async move {
@@ -159,6 +159,7 @@ pub fn StartWorkout() -> Element {
                             value: "{logged_at}",
                             oninput: move |e| logged_at.set(e.value()),
                         }
+                        span { class: "text-xs text-text-muted", "{crate::views::format::to_british_date(&logged_at())}" }
                     }
 
                     for (card_index , card) in cards().iter().enumerate() {

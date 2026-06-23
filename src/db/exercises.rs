@@ -70,3 +70,54 @@ pub async fn insert_exercise_log(
 
     Ok(())
 }
+
+#[derive(Debug, Clone, sqlx::FromRow)]
+pub struct PersonalRecord {
+    pub exercise_name: String,
+    pub best_weight: f64,
+    pub best_weight_reps: i64,
+    pub best_weight_date: String,
+    pub best_reps: i64,
+    pub best_reps_weight: f64,
+    pub best_reps_date: String,
+}
+
+/// For each exercise, finds the heaviest set ever logged, and separately
+/// the highest rep count ever logged, these are often different sets,
+/// a max-weight single differs from a max-rep set at a lighter load.
+pub async fn list_personal_records(pool: &SqlitePool) -> Result<Vec<PersonalRecord>, sqlx::Error> {
+    sqlx::query_as::<_, PersonalRecord>(
+        "SELECT
+            exercises.name AS exercise_name,
+            best_weight_row.weight AS best_weight,
+            best_weight_row.reps AS best_weight_reps,
+            best_weight_row.logged_at AS best_weight_date,
+            best_reps_row.reps AS best_reps,
+            best_reps_row.weight AS best_reps_weight,
+            best_reps_row.logged_at AS best_reps_date
+         FROM exercises
+         JOIN (
+             SELECT exercise_id, weight, reps, logged_at
+             FROM exercise_logs el
+             WHERE deleted_at IS NULL
+               AND weight = (
+                   SELECT MAX(weight) FROM exercise_logs
+                   WHERE exercise_id = el.exercise_id AND deleted_at IS NULL
+               )
+             GROUP BY exercise_id
+         ) AS best_weight_row ON best_weight_row.exercise_id = exercises.id
+         JOIN (
+             SELECT exercise_id, weight, reps, logged_at
+             FROM exercise_logs el
+             WHERE deleted_at IS NULL
+               AND reps = (
+                   SELECT MAX(reps) FROM exercise_logs
+                   WHERE exercise_id = el.exercise_id AND deleted_at IS NULL
+               )
+             GROUP BY exercise_id
+         ) AS best_reps_row ON best_reps_row.exercise_id = exercises.id
+         ORDER BY exercises.name",
+    )
+    .fetch_all(pool)
+    .await
+}

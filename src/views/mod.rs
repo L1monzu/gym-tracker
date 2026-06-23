@@ -10,3 +10,6 @@ mod start_workout;
 pub use start_workout::StartWorkout;
 mod navbar;
 pub use navbar::Navbar;
+mod records;
+pub use records::Records;
+pub mod format;

@@ -22,6 +22,8 @@ pub fn Navbar() -> Element {
             Link { to: Route::LogExercise {}, class: "text-text-light dark:text-text-dark font-medium", "Log Exercise" }
             Link { to: Route::LogCardio {}, class: "text-text-light dark:text-text-dark font-medium", "Log Cardio" }
             Link { to: Route::History {}, class: "text-text-light dark:text-text-dark font-medium", "History" }
+            Link { to: Route::Records {}, class: "text-text-light dark:text-text-dark font-medium", "Records" }
+
             button {
                 class: "ml-auto text-text-light dark:text-text-dark text-sm border border-gray-300 dark:border-gray-700 rounded-md px-3 py-1",
                 onclick: move |_| is_dark.set(!is_dark()),

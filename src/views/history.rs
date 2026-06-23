@@ -1,5 +1,6 @@
 use crate::db::export::build_workbook;
 use crate::db::history::{delete_cardio_log, delete_exercise_logs, load_history, HistoryEntry};
+use crate::views::format::to_british_date;
 use dioxus::prelude::*;
 use sqlx::SqlitePool;
 
@@ -76,7 +77,7 @@ pub fn History() -> Element {
                         for group in groups {
                             div {
                                 h2 { class: "text-lg font-semibold text-text-light dark:text-text-dark mb-2",
-                                    "{group.date}"
+                                    "{to_british_date(&group.date)}"
                                 }
                                 div { class: "flex flex-col gap-2",
                                     for (entry_index , entry) in group.entries.iter().enumerate() {
