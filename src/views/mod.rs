@@ -13,3 +13,5 @@ pub use navbar::Navbar;
 mod records;
 pub use records::Records;
 pub mod format;
+mod bodyweight;
+pub use bodyweight::BodyWeight;

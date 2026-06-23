@@ -12,6 +12,7 @@ pub mod exercises;
 pub mod export;
 pub mod history;
 pub mod templates;
+pub mod bodyweight;
 
 /// Works out the right folder to store app data in, depending on which
 /// platform we're running on.
