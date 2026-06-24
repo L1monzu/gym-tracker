@@ -121,3 +121,24 @@ pub async fn list_personal_records(pool: &SqlitePool) -> Result<Vec<PersonalReco
     .fetch_all(pool)
     .await
 }
+#[derive(Debug, Clone, sqlx::FromRow)]
+pub struct ProgressPoint {
+    pub logged_at: String,
+    pub weight: f64,
+}
+
+/// Returns the heaviest set for this exercise on each day it was
+/// logged, ordered by date, used to plot a weight-over-time graph.
+pub async fn exercise_progress(pool: &SqlitePool, exercise_name: &str) -> Result<Vec<ProgressPoint>, sqlx::Error> {
+    sqlx::query_as::<_, ProgressPoint>(
+        "SELECT logged_at, MAX(weight) AS weight
+         FROM exercise_logs
+         JOIN exercises ON exercises.id = exercise_logs.exercise_id
+         WHERE exercises.name = ?1 COLLATE NOCASE AND exercise_logs.deleted_at IS NULL
+         GROUP BY logged_at
+         ORDER BY logged_at",
+    )
+    .bind(exercise_name)
+    .fetch_all(pool)
+    .await
+}

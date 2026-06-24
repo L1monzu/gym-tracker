@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 
 #[component]
 pub fn Navbar() -> Element {
-    let mut is_dark = use_signal(|| true);
+    let mut is_dark = use_context_provider(|| Signal::new(true));
 
     use_effect(move || {
         let dark = is_dark();
@@ -24,6 +24,7 @@ pub fn Navbar() -> Element {
             Link { to: Route::History {}, class: "text-text-light dark:text-text-dark font-medium", "History" }
             Link { to: Route::Records {}, class: "text-text-light dark:text-text-dark font-medium", "Records" }
             Link { to: Route::BodyWeight {}, class: "text-text-light dark:text-text-dark font-medium", "Bodyweight" }
+            Link { to: Route::Progress {}, class: "text-text-light dark:text-text-dark font-medium", "Progress" }
 
             button {
                 class: "ml-auto text-text-light dark:text-text-dark text-sm border border-gray-300 dark:border-gray-700 rounded-md px-3 py-1",

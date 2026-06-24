@@ -15,3 +15,5 @@ pub use records::Records;
 pub mod format;
 mod bodyweight;
 pub use bodyweight::BodyWeight;
+mod progress;
+pub use progress::Progress;
