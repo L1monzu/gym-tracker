@@ -43,6 +43,7 @@ pub fn History() -> Element {
         }
     };
 
+    let mut search_query = use_signal(String::new);
     let history = use_resource({
         let pool = pool.clone();
         move || {
@@ -55,6 +56,14 @@ pub fn History() -> Element {
     rsx! {
         div { class: "min-h-screen bg-background-light dark:bg-background-dark p-6",
             h1 { class: "text-2xl font-bold text-text-light dark:text-text-dark mb-6", "History" }
+
+            input {
+                class: "w-full max-w-md mb-4 rounded-md border border-gray-300 dark:border-gray-700 bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark px-3 py-2",
+                r#type: "text",
+                placeholder: "Search exercises or activities...",
+                value: "{search_query}",
+                oninput: move |e| search_query.set(e.value()),
+            }
 
             div { class: "mb-6",
                 button {
@@ -72,9 +81,41 @@ pub fn History() -> Element {
                 Some(groups) if groups.is_empty() => rsx! {
                     p { class: "text-text-muted", "No workouts logged yet." }
                 },
-                Some(groups) => rsx! {
+                Some(groups) => {
+                    let query = search_query().to_lowercase();
+                    let filtered_groups: Vec<_> = groups
+                        .iter()
+                        .filter_map(|group| {
+                            if query.trim().is_empty() {
+                                return Some(group.clone());
+                            }
+                            let matching_entries: Vec<_> = group
+                                .entries
+                                .iter()
+                                .filter(|entry| match entry {
+                                    HistoryEntry::Exercise { exercise_name, .. } => {
+                                        exercise_name.to_lowercase().contains(&query)
+                                    }
+                                    HistoryEntry::Cardio { activity, .. } => {
+                                        activity.to_lowercase().contains(&query)
+                                    }
+                                })
+                                .cloned()
+                                .collect();
+                            if matching_entries.is_empty() {
+                                None
+                            } else {
+                                Some(crate::db::history::DayGroup {
+                                    date: group.date.clone(),
+                                    entries: matching_entries,
+                                })
+                            }
+                        })
+                        .collect();
+
+                    rsx! {
                     div { class: "flex flex-col gap-6 max-w-md",
-                        for group in groups {
+                        for group in &filtered_groups {
                             div {
                                 h2 { class: "text-lg font-semibold text-text-light dark:text-text-dark mb-2",
                                     "{to_british_date(&group.date)}"
@@ -152,6 +193,7 @@ pub fn History() -> Element {
                                 }
                             }
                         }
+                    }
                     }
                 },
             }
