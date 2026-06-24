@@ -25,6 +25,7 @@ pub fn Navbar() -> Element {
             Link { to: Route::Records {}, class: "text-text-light dark:text-text-dark font-medium", "Records" }
             Link { to: Route::BodyWeight {}, class: "text-text-light dark:text-text-dark font-medium", "Bodyweight" }
             Link { to: Route::Progress {}, class: "text-text-light dark:text-text-dark font-medium", "Progress" }
+            Link { to: Route::ManageTemplates {}, class: "text-text-light dark:text-text-dark font-medium", "Manage Templates" }
 
             button {
                 class: "ml-auto text-text-light dark:text-text-dark text-sm border border-gray-300 dark:border-gray-700 rounded-md px-3 py-1",

@@ -17,3 +17,5 @@ mod bodyweight;
 pub use bodyweight::BodyWeight;
 mod progress;
 pub use progress::Progress;
+mod manage_templates;
+pub use manage_templates::ManageTemplates;

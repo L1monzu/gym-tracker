@@ -181,3 +181,67 @@ pub async fn suggested_next_template(pool: &SqlitePool) -> Result<Option<Templat
 
     Ok(Some(templates[next_index].clone()))
 }
+
+pub async fn add_template_exercise(
+    pool: &SqlitePool,
+    template_id: i64,
+    exercise_name: &str,
+) -> Result<(), sqlx::Error> {
+    let max_position: Option<i64> = sqlx::query_scalar(
+        "SELECT MAX(position) FROM template_exercises WHERE template_id = ?1",
+    )
+    .bind(template_id)
+    .fetch_one(pool)
+    .await?;
+
+    let next_position = max_position.unwrap_or(0) + 1;
+
+    sqlx::query(
+        "INSERT INTO template_exercises (template_id, exercise_name, position, target_sets)
+         VALUES (?1, ?2, ?3, 3)",
+    )
+    .bind(template_id)
+    .bind(exercise_name)
+    .bind(next_position)
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+
+pub async fn remove_template_exercise(pool: &SqlitePool, id: i64) -> Result<(), sqlx::Error> {
+    sqlx::query("DELETE FROM template_exercises WHERE id = ?1")
+        .bind(id)
+        .execute(pool)
+        .await?;
+    Ok(())
+}
+
+#[allow(clippy::too_many_arguments)]
+pub async fn update_template_exercise(
+    pool: &SqlitePool,
+    id: i64,
+    exercise_name: &str,
+    target_sets: i64,
+    rep_range: &str,
+    rest_time: &str,
+    suggested_weight: &str,
+    notes: &str,
+) -> Result<(), sqlx::Error> {
+    sqlx::query(
+        "UPDATE template_exercises
+         SET exercise_name = ?1, target_sets = ?2, rep_range = ?3,
+             rest_time = ?4, suggested_weight = ?5, notes = ?6
+         WHERE id = ?7",
+    )
+    .bind(exercise_name)
+    .bind(target_sets)
+    .bind(rep_range)
+    .bind(rest_time)
+    .bind(suggested_weight)
+    .bind(notes)
+    .bind(id)
+    .execute(pool)
+    .await?;
+    Ok(())
+}
