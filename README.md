@@ -92,6 +92,10 @@ SQLite is the only persistent store, all data lives in a single file in the app'
 
 Both tools can connect directly to the exported `.xlsx` file as a data source, the Overview, Exercises, and Cardio sheets are already in a flat, long-format shape suited to building dashboards or pivot tables in either tool. No further integration work is required for basic use, a live database connection (rather than a file) would be a separate, larger undertaking.
 
+## Known limitations
+
+- **Android hardware/gesture back button exits the app** rather than navigating to the previous screen. This is a current limitation in Dioxus's underlying webview layer (the back button event isn't forwarded to the app), not something fixable from application code alone. Use the in-app back arrow in the navbar instead.
+
 ## Roadmap
 
 Planned future work:
@@ -99,6 +103,7 @@ Planned future work:
 - [ ] Exercise images and descriptions
 - [ ] Exercise categories / muscle groups
 - [ ] Full Android Share Sheet integration for export (currently saves to Downloads, shareable manually)
+- [ ] Native handling of the Android back button (requires native Activity code via JNI, deferred for the same reasons as the Share Sheet)
 - [ ] Cloud sync and user accounts
 
 ## License

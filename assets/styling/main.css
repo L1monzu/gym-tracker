@@ -1,9 +1,12 @@
-body {
-    body {
-    margin: 0;
-}
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow-x: hidden;
 }
 
+body {
+  min-height: 100vh;
+}
 #hero {
     margin: 0;
     display: flex;
