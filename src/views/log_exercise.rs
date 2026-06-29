@@ -1,4 +1,5 @@
 use crate::db::exercises::{insert_exercise_log, list_exercises, NewExerciseLog, SetEntry};
+use crate::db::templates::last_logged_sets;
 use dioxus::prelude::*;
 use sqlx::SqlitePool;
 
@@ -24,6 +25,28 @@ pub fn LogExercise() -> Element {
     let mut logged_at = use_signal(crate::views::start_workout::today);
     let mut set_inputs = use_signal(|| vec![SetInput::default()]);
     let mut status = use_signal(String::new);
+
+    let load_last_sets = {
+        let pool = pool.clone();
+        move |_| {
+            let pool = pool.clone();
+            let name = exercise_name();
+            if name.trim().is_empty() {
+                return;
+            }
+            spawn(async move {
+                let last_sets = last_logged_sets(&pool, &name).await.unwrap_or_default();
+                if !last_sets.is_empty() {
+                    set_inputs.set(
+                        last_sets
+                            .into_iter()
+                            .map(|s| SetInput { weight: s.weight.to_string(), reps: s.reps.to_string() })
+                            .collect(),
+                    );
+                }
+            });
+        }
+    };
 
     let add_set = move |_| {
         set_inputs.write().push(SetInput::default());
@@ -97,6 +120,7 @@ pub fn LogExercise() -> Element {
                         list: "known-exercises",
                         value: "{exercise_name}",
                         oninput: move |e| exercise_name.set(e.value()),
+                        onblur: load_last_sets,
                     }
                     datalist { id: "known-exercises",
                         if let Some(exercises) = &*known_exercises.read() {

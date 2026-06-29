@@ -97,7 +97,7 @@ pub fn StartWorkout() -> Element {
             async move { suggested_next_template(&pool).await.ok().flatten() }
         }
     });
-    
+
     let mut selected_template = use_signal(|| None::<Template>);
     let mut cards = use_signal(Vec::<ExerciseCard>::new);
     let mut status = use_signal(String::new);
@@ -163,6 +163,9 @@ pub fn StartWorkout() -> Element {
                     }
 
                     for (card_index , card) in cards().iter().enumerate() {
+                        {
+                        let id = card.id;
+                        rsx! {
                         div {
                             key: "{card.id}",
                             class: if just_moved_id() == Some(card.id) {
@@ -180,17 +183,17 @@ pub fn StartWorkout() -> Element {
                                     class: "text-text-muted px-2 shrink-0",
                                     onclick: {
                                         let pool = pool.clone();
-                                        let id = card.id;
                                         move |_| {
+                                            if card_index == 0 {
+                                                return;
+                                            }
+                                            cards.write().swap(card_index, card_index - 1);
+                                            just_moved_id.set(Some(id));
+
                                             let pool = pool.clone();
                                             let template_id = selected_template().as_ref().map(|t| t.id).unwrap_or_default();
                                             spawn(async move {
                                                 let _ = move_template_exercise(&pool, template_id, id, -1).await;
-                                                let exercises =
-                                                    list_template_exercises(&pool, template_id).await.unwrap_or_default();
-                                                let new_cards = build_cards(&pool, exercises).await;
-                                                cards.set(new_cards);
-                                                just_moved_id.set(Some(id));
                                             });
                                         }
                                     },
@@ -200,17 +203,17 @@ pub fn StartWorkout() -> Element {
                                     class: "text-text-muted px-2 shrink-0",
                                     onclick: {
                                         let pool = pool.clone();
-                                        let id = card.id;
                                         move |_| {
+                                            if card_index + 1 >= cards().len() {
+                                                return;
+                                            }
+                                            cards.write().swap(card_index, card_index + 1);
+                                            just_moved_id.set(Some(id));
+
                                             let pool = pool.clone();
                                             let template_id = selected_template().as_ref().map(|t| t.id).unwrap_or_default();
                                             spawn(async move {
                                                 let _ = move_template_exercise(&pool, template_id, id, 1).await;
-                                                let exercises =
-                                                    list_template_exercises(&pool, template_id).await.unwrap_or_default();
-                                                let new_cards = build_cards(&pool, exercises).await;
-                                                cards.set(new_cards);
-                                                just_moved_id.set(Some(id));
                                             });
                                         }
                                     },
@@ -268,6 +271,8 @@ pub fn StartWorkout() -> Element {
                                 onclick: move |_| cards.write()[card_index].sets.push(SetInput::default()),
                                 "+ Add set"
                             }
+                        }
+                        }
                         }
                     }
 
